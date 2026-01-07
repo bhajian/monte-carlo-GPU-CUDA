@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: montecarlo-service
+  namespace: montecarlo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: montecarlo-service
+  template:
+    metadata:
+      labels:
+        app: montecarlo-service
+    spec:
+      serviceAccountName: montecarlo-service
+      containers:
+        - name: service
+          image: ghcr.io/example/montecarlo-service:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: WORKER_IMAGE
+              value: ghcr.io/example/montecarlo-worker:latest
+            - name: DEFAULT_CALLBACK_URL
+              value: http://montecarlo-callback.montecarlo.svc.cluster.local:8090/callback
+            - name: NAMESPACE
+              value: montecarlo
+            - name: MPI_API_VERSION
+              value: v2beta1
+          ports:
+            - containerPort: 8080

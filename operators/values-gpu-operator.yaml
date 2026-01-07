@@ -1,0 +1,5 @@
+operator:
+  defaultRuntime: containerd
+
+mig:
+  strategy: none

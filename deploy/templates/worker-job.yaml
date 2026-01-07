@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mc-worker-sample
+  namespace: montecarlo
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: ghcr.io/example/montecarlo-worker:latest
+          env:
+            - name: NUM_SIMULATIONS
+              value: "1000000"
+            - name: SIMULATION
+              value: "pi"
+            - name: CALLBACK_URL
+              value: "http://montecarlo-callback.montecarlo.svc.cluster.local:8090/callback"
+            - name: RUN_ID
+              value: "mc-worker-sample"
+          resources:
+            limits:
+              nvidia.com/gpu: 1

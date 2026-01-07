@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: montecarlo-callback
+  namespace: montecarlo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: montecarlo-callback
+  template:
+    metadata:
+      labels:
+        app: montecarlo-callback
+    spec:
+      containers:
+        - name: callback
+          image: ghcr.io/example/montecarlo-callback:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: S3_BUCKET
+              value: ""
+            - name: S3_PREFIX
+              value: montecarlo/results
+          ports:
+            - containerPort: 8090

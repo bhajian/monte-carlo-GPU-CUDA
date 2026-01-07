@@ -1,0 +1,44 @@
+apiVersion: kubeflow.org/v2beta1
+kind: MPIJob
+metadata:
+  name: mc-mpi-sample
+  namespace: montecarlo
+spec:
+  slotsPerWorker: 1
+  cleanPodPolicy: Running
+  mpiReplicaSpecs:
+    Launcher:
+      replicas: 1
+      template:
+        spec:
+          containers:
+            - name: launcher
+              image: ghcr.io/example/montecarlo-worker:latest
+              env:
+                - name: NUM_SIMULATIONS
+                  value: "2000000"
+                - name: SIMULATION
+                  value: "pi"
+                - name: CALLBACK_URL
+                  value: "http://montecarlo-callback.montecarlo.svc.cluster.local:8090/callback"
+                - name: RUN_ID
+                  value: "mc-mpi-sample"
+    Worker:
+      replicas: 2
+      template:
+        spec:
+          containers:
+            - name: worker
+              image: ghcr.io/example/montecarlo-worker:latest
+              env:
+                - name: NUM_SIMULATIONS
+                  value: "2000000"
+                - name: SIMULATION
+                  value: "pi"
+                - name: CALLBACK_URL
+                  value: "http://montecarlo-callback.montecarlo.svc.cluster.local:8090/callback"
+                - name: RUN_ID
+                  value: "mc-mpi-sample"
+              resources:
+                limits:
+                  nvidia.com/gpu: 1
