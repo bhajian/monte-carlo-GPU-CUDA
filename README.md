@@ -10,6 +10,13 @@ It includes:
 - Operator install materials (GPU Operator, NCCL, NFD, MPI, SR-IOV)
 - Terraform scaffolding for AWS EKS, S3, and GPU nodes
 
+## Why CUDA for Monte Carlo
+
+CPU-based Monte Carlo often fans out thousands of tiny tasks that need heavy scheduling.
+CUDA batches those paths into a single GPU job, reducing per-task scheduling overhead for small tasks.
+
+![CUDA batching reduces per-task scheduling overhead](docs/images/cuda-batched-montecarlo.svg)
+
 ## Repo layout
 
 - `service/` – API service container to accept jobs and launch workers
@@ -21,7 +28,10 @@ It includes:
 - `terraform/` – AWS EKS/S3/GPU node scaffolding
 - `scripts/` – helper scripts (build/push)
 
+## Notebooks
+
+- `notebooks/api_evaluation.ipynb` – Calls the service and callback APIs and performs basic checks.
+
 ## Quick start
 
 See `docs/USAGE.md` for full instructions.
-# monte-carlo-GPU-CUDA
