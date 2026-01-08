@@ -17,6 +17,19 @@ CUDA batches those paths into a single GPU job, reducing per-task scheduling ove
 
 ![CUDA batching reduces per-task scheduling overhead](docs/images/cuda-batched-montecarlo.svg)
 
+## Architecture
+
+- `service` API accepts a job payload and launches worker Jobs or MPIJobs in Kubernetes.
+- `worker` runs the simulation (CPU or CUDA), then posts results to the callback URL and exits.
+- `callback` receives results and stores them in S3 or on disk.
+- Operators (GPU, NCCL, MPI, NFD, SR-IOV) provide the runtime dependencies for GPU and MPI runs.
+
+## Consumption modes
+
+1) Single GPU / single node: run the worker container directly with `--gpus` for a simple local job.
+2) SOA with leader worker nodes: use the service API to launch worker Jobs, or MPI multi-node runs
+   where rank 0 acts as the leader and other ranks are worker nodes.
+
 ## Repo layout
 
 - `service/` – API service container to accept jobs and launch workers
@@ -27,6 +40,13 @@ CUDA batches those paths into a single GPU job, reducing per-task scheduling ove
 - `docs/` – usage documentation
 - `terraform/` – AWS EKS/S3/GPU node scaffolding
 - `scripts/` – helper scripts (build/push)
+
+## Examples
+
+- `docs/USAGE.md` – end-to-end build, deploy, and job submission examples
+- `deploy/templates/worker-job.yaml` – single worker Job example
+- `deploy/templates/mpi-job.yaml` – multi-node MPIJob example
+- `notebooks/api_evaluation.ipynb` – API smoke tests against service and callback
 
 ## Notebooks
 

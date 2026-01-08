@@ -6,6 +6,14 @@
 - kubectl configured for your cluster
 - Helm 3 for operator installs
 
+## Execution flavors
+
+This stack supports two flavors:
+
+1) Single GPU / single node: run one worker container with `--gpus` on a single machine.
+2) SOA with leader worker nodes: run the API service to launch worker Jobs, or use MPI for
+   multi-node runs where rank 0 acts as the leader and other ranks are worker nodes.
+
 ## Build images
 
 From repo root:
@@ -28,6 +36,31 @@ Update the image names in `deploy/manifests/service-deployment.yaml`,
 ```bash
 ./deploy/deploy.sh
 ```
+
+## Run a worker directly (single node)
+
+The worker is a one-shot container: it reads env vars, runs, posts results to the callback,
+and exits. This is useful for a simple local run without the service API.
+
+```bash
+docker build -t montecarlo-worker ./worker
+docker build -t montecarlo-callback ./callback
+
+docker network create montecarlo
+docker run -d --name mc-callback --network montecarlo -p 8090:8090 montecarlo-callback
+
+docker run --rm --network montecarlo \
+  -e SIMULATION=pi \
+  -e NUM_SIMULATIONS=1000000 \
+  -e RUN_ID=local-1 \
+  -e CALLBACK_URL=http://mc-callback:8090/callback \
+  -e FORCE_CPU=1 \
+  montecarlo-worker
+```
+
+Notes:
+- For GPU: add `--gpus all` and drop `FORCE_CPU=1`.
+- For option pricing: set `SIMULATION=option_price` and `HYPERPARAMS_JSON='{"spot":120,"strike":100,"vol":0.3,"rate":0.04}'`.
 
 ## Submit a job
 
