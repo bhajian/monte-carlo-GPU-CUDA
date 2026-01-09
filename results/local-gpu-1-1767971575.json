@@ -1,0 +1,1 @@
+{"run_id": "local-gpu-1", "simulation": "pi", "payload": {}, "hyperparams": {}, "result": {"estimate": 3.140796, "hits": 785199, "samples": 1000000}, "backend": "cuda", "world_rank": 0, "world_size": 1, "host": "7541e95c84bb", "duration_seconds": 1.226015567779541}
